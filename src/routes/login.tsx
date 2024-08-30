@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { FcGoogle } from "react-icons/fc";
 
 import { useForm } from '@tanstack/react-form'
+import { loginApi } from '@/service/authApi'
 
 export const Route = createFileRoute('/login')({
   component: Login
@@ -19,14 +20,16 @@ export const Route = createFileRoute('/login')({
 
 function Login(){
 
- 
+  const navigate = useNavigate()
+
   const form = useForm({
     defaultValues: {
       email: '',
       password: '',
     },
-    onSubmit: async (values) => {
-      console.log(values)
+    onSubmit: async ({value}) => {
+      await loginApi(value.email, value.password)
+      navigate({to: '/profile'})
     },
   })
 
