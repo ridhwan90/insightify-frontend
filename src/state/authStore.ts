@@ -1,10 +1,11 @@
 import { create } from 'zustand'
 
 interface User {
-  cuid: string
+  id: string
   firstName: string
   lastName: string
   email: string
+  picture: string
 }
 
 interface AuthStore {

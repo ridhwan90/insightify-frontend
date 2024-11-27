@@ -32,7 +32,7 @@ function SignUp() {
       },
       onSubmit: async ({value}) => {
         await registerApi(value.firstName, value.lastName, value.email, value.password)
-        navigate({to: '/profile'})
+        navigate({to: '/dashboard'})
       }
     })
   
@@ -183,10 +183,13 @@ function SignUp() {
                     </Button>
                   )}
                 />
-                <Button variant="outline" className="w-full">
-                  <FcGoogle className="mr-2" size={20} />
+                  <a
+                    href="http://localhost:8787/api/auth/google"
+                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    <FcGoogle className="mr-2" size={20} />
                     Sign up with Google
-                </Button>
+                  </a>
               </div>
               <div className="mt-4 text-center text-sm">
                 Already have an account?{" "}
