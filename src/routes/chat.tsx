@@ -9,6 +9,7 @@ import { BsRobot, BsThreeDots } from "react-icons/bs"
 import { FaUser } from "react-icons/fa"
 import { Message, createChatStream, createMessage } from '@/service/chatApi'
 import { motion, AnimatePresence } from "framer-motion"
+import Markdown from 'react-markdown'
 
 interface ChatMessage extends Message {
   id: string
@@ -39,10 +40,18 @@ const MessageBubble = ({ message, isStreaming = false }: { message: ChatMessage,
         className={`group relative max-w-[80%] rounded-2xl px-4 py-2 ${
           isAI 
             ? 'bg-muted/50 backdrop-blur-sm' 
-            : 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground'
+            : 'bg-primary text-primary-foreground'
         }`}
       >
-        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+        <div className="prose prose-sm dark:prose-invert max-w-none">
+          <Markdown
+            components={{
+              h3: ({node, ...props}) => <h3 className="text-xl font-bold mb-2" {...props} />
+            }}
+          >
+            {message.content}
+          </Markdown>
+        </div>
         <span className="mt-1 block text-[10px] opacity-50">
           {message.timestamp.toLocaleTimeString()}
         </span>
