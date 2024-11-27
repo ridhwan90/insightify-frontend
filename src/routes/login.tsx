@@ -199,7 +199,7 @@ function Login() {
                 </div>
 
                 <a
-                  href="http://localhost:8787/api/auth/google"
+                  href="https://insightify-server.ridhwan-saberi.workers.dev/api/auth/google"
                   className="w-full"
                 >
                   <Button type="button" variant="outline" className="w-full">
@@ -214,10 +214,10 @@ function Login() {
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
               <Link
-                to="/register"
-                className="font-medium text-primary underline-offset-4 hover:underline"
+                to="/sign-up"
+                className="text-sm font-semibold leading-6 text-primary"
               >
-                Sign up
+                Create an account
               </Link>
             </p>
           </CardFooter>

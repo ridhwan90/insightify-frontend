@@ -184,7 +184,7 @@ function SignUp() {
                   )}
                 />
                   <a
-                    href="http://localhost:8787/api/auth/google"
+                    href="https://insightify-server.ridhwan-saberi.workers.dev/api/auth/google"
                     className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                   >
                     <FcGoogle className="mr-2" size={20} />

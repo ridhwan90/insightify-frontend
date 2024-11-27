@@ -28,7 +28,8 @@ interface VerifyResetTokenResponse {
     error?: string;
 }
 
-const BASE_URL = 'http://localhost:8787/api'
+const BASE_URL = 'https://insightify-server.ridhwan-saberi.workers.dev/api'
+// const BASE_URL = 'http://localhost:8787/api'
 export const axiosInstance = axios.create({
     baseURL: BASE_URL,
     headers: {

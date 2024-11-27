@@ -142,7 +142,7 @@ const Navbar = () => {
                   <Link to="/login">Sign in</Link>
                 </Button>
                 <Button variant="gradient">
-                  <Link to="/register">Get Started</Link>
+                  <Link to="/sign-up">Get Started</Link>
                 </Button>
               </>
             )}

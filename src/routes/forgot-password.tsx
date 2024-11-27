@@ -78,7 +78,7 @@ function ForgotPassword() {
           to: '/reset-password',
           search: {
             email,
-            resetToken: validateOTPResponse.resetToken,
+            resetToken: validateOTPResponse.resetToken || '',
           }
         })
       } catch (err) {
