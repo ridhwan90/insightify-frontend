@@ -34,7 +34,8 @@ export const axiosInstance = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
-    }
+    },
+    withCredentials: true
 })
 
 export function setAxiosToken(token: string | null) {
@@ -49,8 +50,6 @@ export async function loginApi(email: string, password: string): Promise<LoginRe
     const res = await axiosInstance.post<LoginResponse>('/login', {
         email,
         password,
-    }, {
-        withCredentials: true
     })
     
     if (res.status !== 200) {
@@ -66,8 +65,6 @@ export async function registerApi(firstName: string, lastName: string, email: st
         lastName,
         email,
         password,
-    }, {
-        withCredentials: true
     })
     
     if (res.status !== 201) {
@@ -76,9 +73,7 @@ export async function registerApi(firstName: string, lastName: string, email: st
 }
 
 export async function validateSession(): Promise<authUser> {
-    const res = await axiosInstance.get<authUser>('/validate-session', {
-        withCredentials: true
-    })
+    const res = await axiosInstance.get<authUser>('/validate-session')
     
     if (res.statusText !== 'OK') {
         throw new Error('Session validation failed')
@@ -88,15 +83,11 @@ export async function validateSession(): Promise<authUser> {
 }
 
 export async function logoutApi(): Promise<void> {
-    await axiosInstance.get('/logout', {
-        withCredentials: true
-    })
+    await axiosInstance.get('/logout')
 }
 
 export async function refreshToken(): Promise<{ accessToken: string }> {
-    const res = await axiosInstance.get<{ accessToken: string }>('/refresh', {
-        withCredentials: true
-    })
+    const res = await axiosInstance.get<{ accessToken: string }>('/refresh')
     
     if (res.statusText !== 'OK') {
         throw new Error('Token refresh failed')
@@ -108,8 +99,6 @@ export async function refreshToken(): Promise<{ accessToken: string }> {
 export async function changePassword(password: string): Promise<void> {
     const res = await axiosInstance.put('/password', { 
         password 
-    }, {
-        withCredentials: true
     })
     
     if (res.statusText !== 'OK') {
