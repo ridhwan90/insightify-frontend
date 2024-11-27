@@ -10,6 +10,7 @@ import { FaUser } from "react-icons/fa"
 import { Message, createChatStream, createMessage } from '@/service/chatApi'
 import { motion, AnimatePresence } from "framer-motion"
 import Markdown from 'react-markdown'
+import { useNavigate } from '@tanstack/react-router'
 
 interface ChatMessage extends Message {
   id: string
@@ -72,7 +73,9 @@ const MessageBubble = ({ message, isStreaming = false }: { message: ChatMessage,
 
 function Chat() {
   const { currentUser } = useAuth()
+  const navigate = useNavigate()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -85,6 +88,12 @@ function Chat() {
   const [isLoading, setIsLoading] = useState(false)
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState('')
 
+  useEffect(() => {
+    if (!currentUser) {
+      navigate({ to: '/' })
+    }
+  }, [currentUser, navigate])
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
@@ -92,6 +101,12 @@ function Chat() {
   useEffect(() => {
     scrollToBottom()
   }, [messages, currentStreamingMessage])
+
+  useEffect(() => {
+    if (!isLoading) {
+      inputRef.current?.focus()
+    }
+  }, [isLoading])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,7 +123,10 @@ function Chat() {
     setInput('')
     setIsLoading(true)
     setCurrentStreamingMessage('')
-
+    
+    // Focus the input after submission
+    inputRef.current?.focus()
+    
     try {
       // Include initial assistant message if this is the first user message
       const messageHistory = messages.length === 0 
@@ -212,11 +230,14 @@ function Chat() {
           <div className="border-t border-muted/20 bg-muted/5 p-4 backdrop-blur-sm">
             <form onSubmit={handleSubmit} className="flex gap-2">
               <Input
+                ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your message..."
                 className="bg-background/50"
                 disabled={isLoading}
+                onFocus={(e) => e.target.select()}
+                autoFocus
               />
               <Button 
                 type="submit" 
@@ -236,13 +257,11 @@ function Chat() {
 
 export const Route = createFileRoute('/chat')({
   beforeLoad: ({ context }) => {
+    // Check if user is authenticated
     const { currentUser } = context.auth
     if (!currentUser) {
       throw redirect({
-        to: '/login',
-        search: {
-          redirect: '/chat'
-        }
+        to: '/',
       })
     }
   },
