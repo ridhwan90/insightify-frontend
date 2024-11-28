@@ -42,6 +42,8 @@ export default function AuthProvider({ children }: PropsWithChildren) {
                         // Try to refresh the token
                         const response = await refreshToken()
                         const newToken = response.accessToken
+                        console.log('Refreshed token:', newToken)
+                        localStorage.setItem('accessToken', newToken)
 
                         // Update the token in state and axios
                         setAccessToken(newToken)
