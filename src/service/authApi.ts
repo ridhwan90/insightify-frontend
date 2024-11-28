@@ -122,7 +122,7 @@ export async function validateSession(): Promise<authUser> {
 export async function logoutApi(): Promise<void> {
     console.log('Calling logout API');
     try {
-        const res = await axiosInstance.get('/logout', {
+        await axiosInstance.get('/logout', {
             withCredentials: true,
             headers: {
                 'Accept': 'application/json'
