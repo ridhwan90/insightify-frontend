@@ -10,7 +10,8 @@ export type AuthContext = {
     login: (email: string, password: string) => Promise<void>
     logout: () => Promise<void>
     fetchCurrentUser: () => Promise<void>
-    handleGoogleRedirect: () => Promise<void>
+    setAccessToken: (token: string | null) => void
+    setCurrentUser: (user: authUser | null) => void
 }
 
 const AuthContext = createContext<AuthContext | undefined>(undefined)
@@ -244,7 +245,8 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         login,
         logout,
         fetchCurrentUser,
-        handleGoogleRedirect
+        setAccessToken,
+        setCurrentUser
     }
     
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

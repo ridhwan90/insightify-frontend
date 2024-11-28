@@ -20,6 +20,7 @@ import { Route as DashboardImport } from './routes/dashboard'
 import { Route as ChatImport } from './routes/chat'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as GoogleCallbackImport } from './routes/google/callback'
 
 // Create/Update Routes
 
@@ -74,6 +75,12 @@ const AboutRoute = AboutImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GoogleCallbackRoute = GoogleCallbackImport.update({
+  id: '/google/callback',
+  path: '/google/callback',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -144,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignUpImport
       parentRoute: typeof rootRoute
     }
+    '/google/callback': {
+      id: '/google/callback'
+      path: '/google/callback'
+      fullPath: '/google/callback'
+      preLoaderRoute: typeof GoogleCallbackImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -159,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/sign-up': typeof SignUpRoute
+  '/google/callback': typeof GoogleCallbackRoute
 }
 
 export interface FileRoutesByTo {
@@ -171,6 +186,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/sign-up': typeof SignUpRoute
+  '/google/callback': typeof GoogleCallbackRoute
 }
 
 export interface FileRoutesById {
@@ -184,6 +200,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/sign-up': typeof SignUpRoute
+  '/google/callback': typeof GoogleCallbackRoute
 }
 
 export interface FileRouteTypes {
@@ -198,6 +215,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/settings'
     | '/sign-up'
+    | '/google/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -209,6 +227,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/settings'
     | '/sign-up'
+    | '/google/callback'
   id:
     | '__root__'
     | '/'
@@ -220,6 +239,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/settings'
     | '/sign-up'
+    | '/google/callback'
   fileRoutesById: FileRoutesById
 }
 
@@ -233,6 +253,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
   SignUpRoute: typeof SignUpRoute
+  GoogleCallbackRoute: typeof GoogleCallbackRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -245,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
   SignUpRoute: SignUpRoute,
+  GoogleCallbackRoute: GoogleCallbackRoute,
 }
 
 export const routeTree = rootRoute
@@ -265,7 +287,8 @@ export const routeTree = rootRoute
         "/login",
         "/reset-password",
         "/settings",
-        "/sign-up"
+        "/sign-up",
+        "/google/callback"
       ]
     },
     "/": {
@@ -294,6 +317,9 @@ export const routeTree = rootRoute
     },
     "/sign-up": {
       "filePath": "sign-up.tsx"
+    },
+    "/google/callback": {
+      "filePath": "google/callback.tsx"
     }
   }
 }
