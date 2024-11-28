@@ -89,25 +89,47 @@ export async function registerApi(firstName: string, lastName: string, email: st
 }
 
 export async function validateSession(): Promise<authUser> {
-    console.log('Validating session with headers:', axiosInstance.defaults.headers.common);
-    const res = await axiosInstance.get<authUser>('/validate-session', {
-        withCredentials: true
-    })
+    const token = localStorage.getItem('accessToken');
+    console.log('Validating session - Token in localStorage:', token);
+    console.log('Validating session - Headers:', axiosInstance.defaults.headers.common);
     
-    console.log('Validate session response:', res);
-    
-    if (res.status !== 200) {
-        console.error('Session validation failed with status:', res.status);
-        throw new Error('Session validation failed')
+    if (!token) {
+        console.log('No token found, throwing error');
+        throw new Error('No token found');
     }
 
-    return res.data
+    try {
+        const res = await axiosInstance.get<authUser>('/validate-session', {
+            withCredentials: true
+        });
+        
+        console.log('Validate session response:', res);
+        
+        if (res.status !== 200) {
+            console.error('Session validation failed with status:', res.status);
+            throw new Error('Session validation failed');
+        }
+
+        return res.data;
+    } catch (error) {
+        console.error('Validate session error:', error);
+        // Clear any remaining tokens if validation fails
+        localStorage.removeItem('accessToken');
+        throw error;
+    }
 }
 
 export async function logoutApi(): Promise<void> {
-    await axiosInstance.get('/logout', {
-        withCredentials: true
-    })
+    console.log('Calling logout API');
+    try {
+        await axiosInstance.get('/logout', {
+            withCredentials: true
+        });
+        console.log('Logout API call successful');
+    } catch (error) {
+        console.error('Logout API error:', error);
+        throw error;
+    }
 }
 
 export async function refreshToken(): Promise<{ accessToken: string }> {

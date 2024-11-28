@@ -173,10 +173,38 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     const logout = async () => {
         try {
             setIsLoading(true)
+            console.log('Starting logout process');
+            
+            // Clear localStorage first
+            console.log('Clearing localStorage');
+            localStorage.clear(); // Clear all storage just to be safe
+            
+            // Clear axios headers
+            console.log('Clearing axios headers');
+            setAxiosToken(null);
+            
+            // Call logout API to clear cookies
             await logoutApi()
-        } finally {
+            console.log('Logout API successful');
+            
+            // Clear all state
             setAccessToken(null)
             setCurrentUser(null)
+            
+            // Small delay to ensure cleanup is complete
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Force a hard reload to clear any remaining state
+            window.location.replace('/login');
+        } catch (error) {
+            console.error('Logout error:', error)
+            // Still clear everything even if API call fails
+            localStorage.clear();
+            setAxiosToken(null);
+            setAccessToken(null)
+            setCurrentUser(null)
+            window.location.replace('/login');
+        } finally {
             setIsLoading(false)
         }
     }
