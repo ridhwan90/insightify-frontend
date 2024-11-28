@@ -47,7 +47,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
                         setAccessToken(newToken)
                         setAxiosToken(newToken)
 
-                        // Retry the original request with new token
+                        // Retry the original request
                         if (originalRequest.headers) {
                             originalRequest.headers['Authorization'] = `Bearer ${newToken}`
                         }
@@ -56,7 +56,6 @@ export default function AuthProvider({ children }: PropsWithChildren) {
                         // If refresh fails, log the user out
                         setAccessToken(null)
                         setCurrentUser(null)
-                        setAxiosToken(null)
                         return Promise.reject(refreshError)
                     }
                 }
@@ -70,46 +69,13 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         }
     }, [])
 
-    const login = async (email: string, password: string) => {
-        try {
-            setIsLoading(true)
-            const response = await loginApi(email, password)
-            
-            // Set the access token in state and axios
-            setAccessToken(response.accessToken)
-            setAxiosToken(response.accessToken)
-            
-            // Set the user data
-            setCurrentUser(response.user)
-        } catch (error) {
-            console.error('Login error:', error)
-            setAccessToken(null)
-            setAxiosToken(null)
-            setCurrentUser(null)
-            throw error
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    const logout = async () => {
-        try {
-            setIsLoading(true)
-            await logoutApi()
-        } finally {
-            setAccessToken(null)
-            setAxiosToken(null)
-            setCurrentUser(null)
-            setIsLoading(false)
-        }
-    }
+    // Update axios token when accessToken changes
+    useEffect(() => {
+        setAxiosToken(accessToken)
+    }, [accessToken])
 
     const fetchCurrentUser = async () => {
         try {
-            if (!accessToken) {
-                throw new Error('No access token')
-            }
-            
             setIsLoading(true)
             const user = await validateSession()
             setCurrentUser(user)
@@ -123,11 +89,6 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         }
     }
 
-    // Update axios token when accessToken changes
-    useEffect(() => {
-        setAxiosToken(accessToken)
-    }, [accessToken])
-
     // Fetch user on mount and handle token from localStorage
     useEffect(() => {
         // Check for token in localStorage
@@ -138,6 +99,39 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         }
         fetchCurrentUser()
     }, [])
+
+    const login = async (email: string, password: string) => {
+        try {
+            setIsLoading(true)
+            const response = await loginApi(email, password)
+            
+            // Set the token first
+            setAccessToken(response.accessToken)
+            setAxiosToken(response.accessToken)
+            
+            // Then set the user
+            console.log('Login user data:', response.user) // Debug log
+            setCurrentUser(response.user)
+        } catch (error) {
+            console.error('Login error:', error)
+            setAccessToken(null)
+            setCurrentUser(null)
+            throw error
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const logout = async () => {
+        try {
+            setIsLoading(true)
+            await logoutApi()
+        } finally {
+            setAccessToken(null)
+            setCurrentUser(null)
+            setIsLoading(false)
+        }
+    }
 
     const value = {
         isLoading,
