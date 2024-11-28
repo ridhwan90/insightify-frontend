@@ -39,47 +39,51 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         const interceptor = axiosInstance.interceptors.response.use(
             (response) => response,
             async (error: AxiosError) => {
-                const originalRequest = error.config as ExtendedAxiosRequestConfig
+                const originalRequest = error.config as ExtendedAxiosRequestConfig;
+                console.log('Response error intercepted:', error.response?.status);
 
                 if (!originalRequest || !error.response) {
-                    return Promise.reject(error)
+                    return Promise.reject(error);
                 }
 
                 // If the error is 403 and we haven't retried yet
                 if (error.response.status === 403 && !originalRequest._retry) {
-                    originalRequest._retry = true
+                    console.log('Attempting to refresh token due to 403 error');
+                    originalRequest._retry = true;
 
                     try {
                         // Try to refresh the token
-                        const response = await refreshToken()
-                        const newToken = response.accessToken
-                        console.log('Refreshed token:', newToken)
-                        localStorage.setItem('accessToken', newToken)
+                        const response = await refreshToken();
+                        const newToken = response.accessToken;
+                        console.log('Token refresh successful, updating token');
 
                         // Update the token in state and axios
-                        setAccessToken(newToken)
-                        setAxiosToken(newToken)
+                        localStorage.setItem('accessToken', newToken);
+                        setAccessToken(newToken);
+                        setAxiosToken(newToken);
 
-                        // Retry the original request
+                        // Retry the original request with new token
                         if (originalRequest.headers) {
-                            originalRequest.headers['Authorization'] = `Bearer ${newToken}`
+                            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
                         }
-                        return axiosInstance(originalRequest)
+                        return axiosInstance(originalRequest);
                     } catch (refreshError) {
-                        // If refresh fails, log the user out
-                        setAccessToken(null)
-                        setCurrentUser(null)
-                        return Promise.reject(refreshError)
+                        console.error('Token refresh failed:', refreshError);
+                        // If refresh fails, clear everything
+                        localStorage.removeItem('accessToken');
+                        setAccessToken(null);
+                        setCurrentUser(null);
+                        return Promise.reject(refreshError);
                     }
                 }
 
-                return Promise.reject(error)
+                return Promise.reject(error);
             }
-        )
+        );
 
         return () => {
-            axiosInstance.interceptors.response.eject(interceptor)
-        }
+            axiosInstance.interceptors.response.eject(interceptor);
+        };
     }, [])
 
     // Update axios token when accessToken changes

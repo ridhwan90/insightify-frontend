@@ -111,15 +111,33 @@ export async function logoutApi(): Promise<void> {
 }
 
 export async function refreshToken(): Promise<{ accessToken: string }> {
-    const res = await axiosInstance.get<{ accessToken: string }>('/refresh', {
-        withCredentials: true
-    })
-    
-    if (res.statusText !== 'OK') {
-        throw new Error('Token refresh failed')
-    }
+    console.log('Attempting to refresh token');
+    try {
+        const res = await axiosInstance.get<{ accessToken: string }>('/refresh', {
+            withCredentials: true,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        
+        console.log('Refresh token response:', res);
+        
+        if (res.status !== 200) {
+            console.error('Refresh token failed with status:', res.status);
+            throw new Error('Token refresh failed')
+        }
 
-    return res.data
+        if (!res.data.accessToken) {
+            console.error('No access token in refresh response');
+            throw new Error('No access token in refresh response');
+        }
+
+        console.log('Successfully refreshed token');
+        return res.data
+    } catch (error) {
+        console.error('Error refreshing token:', error);
+        throw error;
+    }
 }
 
 export async function changePassword(password: string): Promise<void> {
