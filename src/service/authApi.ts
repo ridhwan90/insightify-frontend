@@ -122,31 +122,50 @@ export async function validateSession(): Promise<authUser> {
 export async function logoutApi(): Promise<void> {
     console.log('Calling logout API');
     try {
-        await axiosInstance.get('/logout', {
-            withCredentials: true
+        const res = await axiosInstance.get('/logout', {
+            withCredentials: true,
+            headers: {
+                'Accept': 'application/json'
+            }
         });
-        console.log('Logout API call successful');
+        
+        // Manually clear the refresh token cookie
+        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.ridhwan-saberi.workers.dev; secure; samesite=strict';
+        
+        console.log('Logout API call successful, cookies after logout:', document.cookie);
     } catch (error) {
         console.error('Logout API error:', error);
+        // Still try to clear the cookie even if API fails
+        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.ridhwan-saberi.workers.dev; secure; samesite=strict';
         throw error;
     }
 }
 
 export async function refreshToken(): Promise<{ accessToken: string }> {
     console.log('Attempting to refresh token');
+    
+    // Check if refresh token cookie exists
+    const hasRefreshToken = document.cookie.includes('refreshToken=');
+    console.log('Refresh token cookie present:', hasRefreshToken);
+    
+    if (!hasRefreshToken) {
+        console.log('No refresh token cookie found');
+        throw new Error('No refresh token found');
+    }
+    
     try {
         const res = await axiosInstance.get<{ accessToken: string }>('/refresh', {
             withCredentials: true,
             headers: {
                 'Accept': 'application/json'
             }
-        })
+        });
         
         console.log('Refresh token response:', res);
         
         if (res.status !== 200) {
             console.error('Refresh token failed with status:', res.status);
-            throw new Error('Token refresh failed')
+            throw new Error('Token refresh failed');
         }
 
         if (!res.data.accessToken) {
@@ -155,9 +174,11 @@ export async function refreshToken(): Promise<{ accessToken: string }> {
         }
 
         console.log('Successfully refreshed token');
-        return res.data
+        return res.data;
     } catch (error) {
         console.error('Error refreshing token:', error);
+        // Clear any remaining cookies if refresh fails
+        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.ridhwan-saberi.workers.dev; secure; samesite=strict';
         throw error;
     }
 }
