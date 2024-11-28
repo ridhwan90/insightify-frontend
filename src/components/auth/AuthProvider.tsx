@@ -102,9 +102,15 @@ export default function AuthProvider({ children }: PropsWithChildren) {
             setCurrentUser(user)
         } catch (error) {
             console.error('Fetch user error:', error)
-            setCurrentUser(null)
-            setAccessToken(null)
-            setAxiosToken(null)
+            // Only clear token if it's not the initial load
+            if (currentUser !== null) {
+                console.log('Clearing token due to validation error');
+                setCurrentUser(null)
+                setAccessToken(null)
+                setAxiosToken(null)
+            } else {
+                console.log('Initial validation failed, keeping token for retry');
+            }
         } finally {
             setIsLoading(false)
         }
@@ -125,23 +131,36 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
     const login = async (email: string, password: string) => {
         try {
+            console.log('Starting login process...');
             setIsLoading(true)
             const response = await loginApi(email, password)
             
             // Set the token first
-            console.log('Login successful, setting token:', response.accessToken);
-            localStorage.setItem('accessToken', response.accessToken)
-            setAxiosToken(response.accessToken) // Set in axios first
-            setAccessToken(response.accessToken) // Then update state
+            console.log('Login successful, received token:', response.accessToken);
             
-            // Then set the user
-            console.log('Login user data:', response.user)
-            setCurrentUser(response.user)
+            try {
+                console.log('Attempting to save token to localStorage');
+                localStorage.setItem('accessToken', response.accessToken);
+                console.log('Token saved to localStorage');
+                
+                console.log('Setting token in axios');
+                setAxiosToken(response.accessToken); // Set in axios first
+                
+                console.log('Updating access token state');
+                setAccessToken(response.accessToken); // Then update state
+                
+                // Then set the user
+                console.log('Setting user data:', response.user);
+                setCurrentUser(response.user);
+            } catch (storageError) {
+                console.error('Error saving to localStorage:', storageError);
+                throw storageError;
+            }
         } catch (error) {
-            console.error('Login error:', error)
-            setAccessToken(null)
-            setCurrentUser(null)
-            throw error
+            console.error('Login error:', error);
+            setAccessToken(null);
+            setCurrentUser(null);
+            throw error;
         } finally {
             setIsLoading(false)
         }

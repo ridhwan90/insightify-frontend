@@ -34,6 +34,7 @@ export const axiosInstance = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
     }
 })
 
@@ -49,6 +50,7 @@ export function setAxiosToken(token: string | null) {
 }
 
 export async function loginApi(email: string, password: string): Promise<LoginResponse> {
+    console.log('Attempting login with email:', email);
     const res = await axiosInstance.post<LoginResponse>('/login', {
         email,
         password,
@@ -56,11 +58,18 @@ export async function loginApi(email: string, password: string): Promise<LoginRe
         withCredentials: true
     })
     
+    console.log('Login API raw response:', res);
+    
     if (res.status !== 200) {
+        console.error('Login failed with status:', res.status);
         throw new Error('Login failed')
     }
 
-    console.log('Login API response:', res.data);
+    console.log('Login API successful response:', res.data);
+    if (!res.data.accessToken) {
+        console.error('No access token in response');
+        throw new Error('No access token received');
+    }
     return res.data
 }
 
@@ -80,11 +89,15 @@ export async function registerApi(firstName: string, lastName: string, email: st
 }
 
 export async function validateSession(): Promise<authUser> {
+    console.log('Validating session with headers:', axiosInstance.defaults.headers.common);
     const res = await axiosInstance.get<authUser>('/validate-session', {
         withCredentials: true
     })
     
-    if (res.statusText !== 'OK') {
+    console.log('Validate session response:', res);
+    
+    if (res.status !== 200) {
+        console.error('Session validation failed with status:', res.status);
         throw new Error('Session validation failed')
     }
 
