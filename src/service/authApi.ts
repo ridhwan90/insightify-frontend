@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 
 export type authUser = {
     cuid: string,
@@ -74,11 +74,6 @@ export async function registerApi(firstName: string, lastName: string, email: st
 
 export async function validateSession(): Promise<authUser> {
     const res = await axiosInstance.get<authUser>('/validate-session')
-    
-    if (res.statusText !== 'OK') {
-        throw new Error('Session validation failed')
-    }
-
     return res.data
 }
 
