@@ -20,7 +20,18 @@ interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 export default function AuthProvider({ children }: PropsWithChildren) {
     const [isLoading, setIsLoading] = useState(true)
-    const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem('accessToken'))
+    const [accessToken, setAccessToken] = useState<string | null>(() => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            console.log('Found token in localStorage, setting in axios:', token);
+            setAxiosToken(token);
+        } else {
+            console.log('No token found in localStorage');
+            setAxiosToken(null);
+        }
+        console.log('Initial token from localStorage:', token);
+        return token;
+    })
     const [currentUser, setCurrentUser] = useState<authUser | null>(null)
 
     // Set up axios interceptor for token refresh
@@ -74,9 +85,11 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     // Update axios token when accessToken changes
     useEffect(() => {
         if (accessToken) {
+            console.log('Setting token in localStorage:', accessToken);
             localStorage.setItem('accessToken', accessToken)
             setAxiosToken(accessToken)
         } else {
+            console.log('Removing token from localStorage');
             localStorage.removeItem('accessToken')
             setAxiosToken(null)
         }
@@ -99,6 +112,14 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
     // Fetch user on mount and handle token from localStorage
     useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            console.log('Setting token on mount:', token);
+            setAxiosToken(token);
+        } else {
+            console.log('No token found on mount');
+            setAxiosToken(null);
+        }
         fetchCurrentUser()
     }, [])
 
@@ -108,12 +129,13 @@ export default function AuthProvider({ children }: PropsWithChildren) {
             const response = await loginApi(email, password)
             
             // Set the token first
+            console.log('Login successful, setting token:', response.accessToken);
             localStorage.setItem('accessToken', response.accessToken)
-            setAccessToken(response.accessToken)
-            setAxiosToken(response.accessToken)
+            setAxiosToken(response.accessToken) // Set in axios first
+            setAccessToken(response.accessToken) // Then update state
             
             // Then set the user
-            console.log('Login user data:', response.user) // Debug log
+            console.log('Login user data:', response.user)
             setCurrentUser(response.user)
         } catch (error) {
             console.error('Login error:', error)

@@ -38,10 +38,13 @@ export const axiosInstance = axios.create({
 })
 
 export function setAxiosToken(token: string | null) {
+    console.log('Setting axios token:', token);
     if (token) {
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        console.log('Axios headers after setting:', axiosInstance.defaults.headers.common);
     } else {
         delete axiosInstance.defaults.headers.common['Authorization']
+        console.log('Removed Authorization header from axios');
     }
 }
 
@@ -57,6 +60,7 @@ export async function loginApi(email: string, password: string): Promise<LoginRe
         throw new Error('Login failed')
     }
 
+    console.log('Login API response:', res.data);
     return res.data
 }
 
