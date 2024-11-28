@@ -1,4 +1,4 @@
-import { type authUser, loginApi, logoutApi, refreshToken, setAxiosToken, validateSession } from "@/service/authApi"
+import { type authUser, loginApi, logoutApi, refreshToken, setAxiosToken, validateSession, handleGoogleCallback } from "@/service/authApi"
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react"
 import { axiosInstance } from "@/service/authApi"
 import { AxiosError, InternalAxiosRequestConfig } from "axios"
@@ -10,6 +10,7 @@ export type AuthContext = {
     login: (email: string, password: string) => Promise<void>
     logout: () => Promise<void>
     fetchCurrentUser: () => Promise<void>
+    handleGoogleRedirect: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContext | undefined>(undefined)
@@ -209,6 +210,33 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         }
     }
 
+    const handleGoogleRedirect = async () => {
+        try {
+            setIsLoading(true);
+            await handleGoogleCallback();
+            await fetchCurrentUser(); // Get the user data after setting the token
+        } catch (error) {
+            console.error('Error handling Google redirect:', error);
+            setAccessToken(null);
+            setCurrentUser(null);
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Check if we're on the dashboard page after Google redirect
+    useEffect(() => {
+        const isAfterGoogleRedirect = window.location.pathname === '/dashboard' && 
+                                    !accessToken && 
+                                    document.cookie.includes('refreshToken');
+        
+        if (isAfterGoogleRedirect) {
+            console.log('Detected Google redirect, handling authentication');
+            handleGoogleRedirect().catch(console.error);
+        }
+    }, []);
+
     const value = {
         isLoading,
         accessToken,
@@ -216,6 +244,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         login,
         logout,
         fetchCurrentUser,
+        handleGoogleRedirect
     }
     
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

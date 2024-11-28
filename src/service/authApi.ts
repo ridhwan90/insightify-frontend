@@ -253,3 +253,25 @@ export async function resetPassword(email: string, password: string, resetToken:
         throw new Error(data.error || 'Failed to reset password');
     }
 }
+
+export async function handleGoogleCallback(): Promise<void> {
+    console.log('Handling Google callback');
+    try {
+        // Since we have the refresh token in cookies after redirect,
+        // we can immediately try to get an access token
+        const response = await refreshToken();
+        console.log('Got initial access token after Google login:', response);
+        
+        if (!response.accessToken) {
+            throw new Error('No access token received');
+        }
+
+        // Set the access token in localStorage and axios
+        localStorage.setItem('accessToken', response.accessToken);
+        setAxiosToken(response.accessToken);
+
+    } catch (error) {
+        console.error('Error handling Google callback:', error);
+        throw error;
+    }
+}

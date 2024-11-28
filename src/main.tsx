@@ -23,6 +23,7 @@ const router = createRouter({
       login: async () => { throw new Error('Auth not initialized') },
       logout: async () => { throw new Error('Auth not initialized') },
       fetchCurrentUser: async () => { throw new Error('Auth not initialized') },
+      handleGoogleRedirect: async () => { throw new Error('Auth not initialized') },
     }
   },
   // Add defaultPreload to ensure auth is loaded
