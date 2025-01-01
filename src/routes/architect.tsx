@@ -161,7 +161,7 @@ const PDFUploader = () => {
           </p>
           <h3 className="text-xl font-semibold mt-4 mb-2">Plan Names:</h3>
           <ul className="list-disc list-inside">
-            {analysisResult.plan_name.map((plan: any, index: number) => (
+            {analysisResult?.result?.plan_name?.map((plan: any, index: number) => (
               <li key={index} className="mb-1">
                 <span className="font-semibold">{plan.name}</span> - Scale:{' '}
                 {plan.scale}
