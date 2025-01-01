@@ -18,6 +18,7 @@ import { Route as LoginImport } from './routes/login'
 import { Route as ForgotPasswordImport } from './routes/forgot-password'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as ChatImport } from './routes/chat'
+import { Route as ArchitectImport } from './routes/architect'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as GoogleCallbackImport } from './routes/google/callback'
@@ -66,6 +67,12 @@ const ChatRoute = ChatImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ArchitectRoute = ArchitectImport.update({
+  id: '/architect',
+  path: '/architect',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
@@ -100,6 +107,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutImport
+      parentRoute: typeof rootRoute
+    }
+    '/architect': {
+      id: '/architect'
+      path: '/architect'
+      fullPath: '/architect'
+      preLoaderRoute: typeof ArchitectImport
       parentRoute: typeof rootRoute
     }
     '/chat': {
@@ -166,6 +180,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/architect': typeof ArchitectRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -179,6 +194,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/architect': typeof ArchitectRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -193,6 +209,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/architect': typeof ArchitectRoute
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -208,6 +225,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/architect'
     | '/chat'
     | '/dashboard'
     | '/forgot-password'
@@ -220,6 +238,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/architect'
     | '/chat'
     | '/dashboard'
     | '/forgot-password'
@@ -232,6 +251,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/architect'
     | '/chat'
     | '/dashboard'
     | '/forgot-password'
@@ -246,6 +266,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ArchitectRoute: typeof ArchitectRoute
   ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -259,6 +280,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ArchitectRoute: ArchitectRoute,
   ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
@@ -281,6 +303,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
+        "/architect",
         "/chat",
         "/dashboard",
         "/forgot-password",
@@ -296,6 +319,9 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/architect": {
+      "filePath": "architect.tsx"
     },
     "/chat": {
       "filePath": "chat.tsx"

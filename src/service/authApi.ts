@@ -9,7 +9,8 @@ export type authUser = {
 }
 
 export type LoginResponse = {
-    accessToken: string,
+    refreshToken: string
+    accessToken: string
     user: authUser
 }
 
@@ -54,8 +55,6 @@ export async function loginApi(email: string, password: string): Promise<LoginRe
     const res = await axiosInstance.post<LoginResponse>('/login', {
         email,
         password,
-    }, {
-        withCredentials: true
     })
     
     console.log('Login API raw response:', res);
@@ -99,9 +98,7 @@ export async function validateSession(): Promise<authUser> {
     }
 
     try {
-        const res = await axiosInstance.get<authUser>('/validate-session', {
-            withCredentials: true
-        });
+        const res = await axiosInstance.get<authUser>('/validate-session');
         
         console.log('Validate session response:', res);
         
@@ -144,12 +141,10 @@ export async function logoutApi(): Promise<void> {
 export async function refreshToken(): Promise<{ accessToken: string }> {
     console.log('Attempting to refresh token');
     
-    // Check if refresh token cookie exists
-    const hasRefreshToken = document.cookie.includes('refreshToken=');
-    console.log('Refresh token cookie present:', hasRefreshToken);
+    const refreshToken = localStorage.getItem('refreshToken');
     
-    if (!hasRefreshToken) {
-        console.log('No refresh token cookie found');
+    if (!refreshToken) {
+        console.log('No refresh token found in localStorage');
         throw new Error('No refresh token found');
     }
     
@@ -157,7 +152,8 @@ export async function refreshToken(): Promise<{ accessToken: string }> {
         const res = await axiosInstance.get<{ accessToken: string }>('/refresh', {
             withCredentials: true,
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${refreshToken}`
             }
         });
         
@@ -177,8 +173,6 @@ export async function refreshToken(): Promise<{ accessToken: string }> {
         return res.data;
     } catch (error) {
         console.error('Error refreshing token:', error);
-        // Clear any remaining cookies if refresh fails
-        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.ridhwan-saberi.workers.dev; secure; samesite=strict';
         throw error;
     }
 }

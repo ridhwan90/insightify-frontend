@@ -39,7 +39,7 @@ const Navbar = () => {
   const privateNavItems = [
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'AI Chat', path: '/chat' },
-    { name: 'Analytics', path: '/analytics' },
+    { name: 'AI Architect', path: '/architect' },
   ]
 
   const navItems = currentUser ? privateNavItems : publicNavItems

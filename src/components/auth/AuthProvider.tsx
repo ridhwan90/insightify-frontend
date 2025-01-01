@@ -142,12 +142,13 @@ export default function AuthProvider({ children }: PropsWithChildren) {
             const response = await loginApi(email, password)
             
             // Set the token first
-            console.log('Login successful, received token:', response.accessToken);
+            console.log('Login successful, received tokens:', response.accessToken, response.refreshToken);
             
             try {
-                console.log('Attempting to save token to localStorage');
+                console.log('Attempting to save tokens to localStorage');
                 localStorage.setItem('accessToken', response.accessToken);
-                console.log('Token saved to localStorage');
+                localStorage.setItem('refreshToken', response.refreshToken);
+                console.log('Tokens saved to localStorage');
                 
                 console.log('Setting token in axios');
                 setAxiosToken(response.accessToken); // Set in axios first
