@@ -31,7 +31,7 @@ const PDFUploader = () => {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async () => {
     console.log('handleSubmit called');
     if (!file) {
       setError('No file selected.');
