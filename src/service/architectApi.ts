@@ -1,23 +1,36 @@
 import { axiosInstance } from './authApi'
+import axios from 'axios';
 
 export const analyzeArchitectPlan = async (file: File) => {
     try {
-        const formData = new FormData();
-        formData.append('file', file);
+        const fileName = file.name.replace(/\s+/g, '_');
 
-        const initialResponse = await axiosInstance.post('/architect-ai', formData, {
+        const initialResponse = await axiosInstance.post('/architect-ai', { file_name: fileName }, {
             headers: {
-                'Content-Type': 'multipart/form-data',
                  ...(axiosInstance.defaults.headers.common?.['Authorization'] && {
                     'Authorization': axiosInstance.defaults.headers.common['Authorization'] as string
                 })
             },
         });
 
-        const id = initialResponse.data.id;
-        if (!id) {
-            throw new Error('No ID returned from /architect-ai');
+        const { id, preSignedURL } = initialResponse.data;
+        if (!id || !preSignedURL) {
+            throw new Error('No ID or preSignedURL returned from /architect-ai');
         }
+
+        const decodedPreSignedURL = decodeURIComponent(preSignedURL);
+
+        console.log('Decoded preSignedURL:', decodedPreSignedURL)
+
+        
+        const formData = new FormData();
+        formData.append(file.name, file);
+
+        await axios.put(decodedPreSignedURL, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
 
         const poll = async (): Promise<any> => {
             const statusResponse = await axiosInstance.get(`/architect-ai/${id}`);
