@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { analyzeArchitectPlan } from '../service/architectApi';
 import { createFileRoute } from '@tanstack/react-router';
 import * as pdfjsLib from 'pdfjs-dist';
+import CheckboxImage from '../components/CheckboxImage';
 
 import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url'
 
@@ -17,6 +18,17 @@ const PDFUploader = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [checkboxState, setCheckboxState] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (analysisResult?.result_json) {
+      const state = analysisResult.result_json.reduce((acc: Record<string, boolean>, item: any) => {
+        acc[item.key] = item.present;
+        return acc;
+      }, {});
+      setCheckboxState(state);
+    }
+  }, [analysisResult]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -151,22 +163,31 @@ const PDFUploader = () => {
       {analysisResult && (
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Analysis Result</h2>
-          <p className="mb-2">
-            <span className="font-semibold">Architect Name:</span>{' '}
-            {analysisResult.architect_name}
-          </p>
-          <p className="mb-2">
-            <span className="font-semibold">Building Address:</span>{' '}
-            {analysisResult.building_address}
-          </p>
-          <h3 className="text-xl font-semibold mt-4 mb-2">Plan Names:</h3>
-          <ul className="list-disc list-inside">
-            {analysisResult?.result?.plan_name?.map((plan: any, index: number) => (
-              <li key={index} className="mb-1">
-                <span className="font-semibold">{plan.name}</span> - Scale:{' '}
-                {plan.scale}
-              </li>
-            ))}
+          <ul className="list-none pl-0">
+            <li className="mb-2 flex items-center justify-between">
+              Pelan kunci (menunjukkan seksyen-seksyen di Shah Alam)
+              <CheckboxImage checked={checkboxState.keyPlan || false} />
+            </li>
+            <li className="mb-2 flex items-center justify-between">
+              Pelan lokasi yang jelas menunjukkan arah dari jalan utama ke tapak skala bersesuaian
+              <CheckboxImage checked={checkboxState.locationPlan || false} />
+            </li>
+            <li className="mb-2 flex items-center justify-between">
+              Pelan Tapak dalam skala 1 : 200
+              <CheckboxImage checked={checkboxState.sitePlan || false} />
+            </li>
+            <li className="mb-2 flex items-center justify-between">
+              Pelan Lantai dalam skala 1 : 100
+              <CheckboxImage checked={checkboxState.groundPlan || false} />
+            </li>
+            <li className="mb-2 flex items-center justify-between">
+              Jadual spesifikasi saiz dan jenis tingkap/ pintu dan bukaan lain.
+              <CheckboxImage checked={checkboxState.windowDoorSpecificationTable || false} />
+            </li>
+            <li className="mb-2 flex items-center justify-between">
+              Jadual peratusan pengudaraan dan pencahayaan (10% dari keluasan keluasan lantai sesuatu ruang)
+              <CheckboxImage checked={checkboxState.ventilationLightingTable || false} />
+            </li>
           </ul>
         </div>
       )}
