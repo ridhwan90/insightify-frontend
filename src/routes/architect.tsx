@@ -3,6 +3,7 @@ import { analyzeArchitectPlan } from '../service/architectApi';
 import { createFileRoute } from '@tanstack/react-router';
 import * as pdfjsLib from 'pdfjs-dist';
 import CheckboxImage from '../components/CheckboxImage';
+import ReactMarkdown from 'react-markdown';
 
 import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url'
 
@@ -189,6 +190,16 @@ const PDFUploader = () => {
               <CheckboxImage checked={checkboxState.ventilationLightingTable || false} />
             </li>
           </ul>
+          {analysisResult.result && (
+            <div className="mt-8">
+              <h3 className="text-xl font-bold mb-4">Analysis Details</h3>
+              <div className="prose max-w-none bg-gray-50 p-4 rounded-md">
+                <ReactMarkdown>
+                  {analysisResult.result}
+                </ReactMarkdown>
+              </div>
+            </div>
+          )}
         </div>
       )}
       {modalOpen && (
